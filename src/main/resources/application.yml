@@ -1,0 +1,18 @@
+logging:
+  level:
+    com.pushkin: ${LOG_LEVEL:info}
+    org.springframework.security: ${LOG_LEVEL:debug}
+
+jwt:
+  ttl_seconds: ${JWT_TTL_SECONDS:31536000}
+  signing-key: ${JWT_KEY:test_key}
+
+users:
+  swagger-admin:
+    login: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin}
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://test:test@localhost:27017/weather}
