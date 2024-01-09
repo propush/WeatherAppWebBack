@@ -1,6 +1,8 @@
 package com.pushkin.weather_app_backend.base
 
 import com.pushkin.weather_app_backend.security.exception.UserNotAuthorizedException
+import com.pushkin.weather_app_backend.user.exception.SignUpException
+import com.pushkin.weather_app_backend.user.exception.UserException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,6 +15,18 @@ open class BaseController {
     protected fun <T> processServiceExceptions(block: () -> T) =
         try {
             ResponseEntity.ok<T?>(block())
+        } catch (e: EntityNotFoundException) {
+            log.error("$e")
+            e.printStackTrace()
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found: ${e.entity}", e)
+        } catch (e: SignUpException) {
+            log.error("$e")
+            e.printStackTrace()
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized", e)
+        } catch (e: UserException) {
+            log.error("$e")
+            e.printStackTrace()
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to run", e)
         } catch (e: UserNotAuthorizedException) {
             log.error("$e")
             e.printStackTrace()

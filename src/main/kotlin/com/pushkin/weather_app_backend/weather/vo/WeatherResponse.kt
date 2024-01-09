@@ -2,7 +2,7 @@ package com.pushkin.weather_app_backend.weather.vo
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class WeatherResponseVO(
+data class WeatherResponse(
     val coord: Coord,
     val weather: List<Weather>,
     val base: String,

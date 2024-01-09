@@ -13,6 +13,23 @@ users:
 spring:
   data:
     mongodb:
-      uri: ${MONGO_URI:mongodb://localhost:27017}
-      username: ${MONGO_USERNAME:test}
-      password: ${MONGO_PASSWORD:test}
+      uri: ${MONGO_URI:mongodb://localhost:1234/weather}
+  profiles:
+    active: "test"
+
+openweathermap:
+  api-key: ${OPENWEATHERMAP_API_KEY:}
+  url: ${OPENWEATHERMAP_BASE_URL:https://api.openweathermap.org}
+  limit: ${OPENWEATHERMAP_LIMIT:10}
+
+weather:
+  cache:
+    ttl_seconds: 60
+
+geodata:
+  cache:
+    ttl_seconds: 3600
+
+server:
+  error:
+    include-message: always

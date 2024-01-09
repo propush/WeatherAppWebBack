@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @Configuration
@@ -33,7 +36,11 @@ class WebSecurityConfiguration(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .cors().and().csrf().disable()
+            .csrf { csrf ->
+                csrf.disable()
+            }.cors { cors ->
+                cors.configurationSource(corsConfigurationSource())
+            }
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers(
                     AntPathRequestMatcher("/swagger-ui.html/**"),
@@ -41,22 +48,42 @@ class WebSecurityConfiguration(
                     AntPathRequestMatcher("/v3/**"),
                     AntPathRequestMatcher("/swagger-resources/**"),
                     AntPathRequestMatcher("/actuator/**")
-                ).hasRole("SWAGGER").and().httpBasic()
-            }.authorizeHttpRequests { auth ->
-                auth.requestMatchers(AntPathRequestMatcher("/api/v1/**")).hasRole("USER")
+                ).hasRole("SWAGGER")
+            }
+            .httpBasic { httpBasic ->
+                httpBasic.realmName("Swagger admin")
+            }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { auth ->
+                auth.requestMatchers(
+                    AntPathRequestMatcher("/api/v1/**")
+                ).hasRole("USER")
             }.authorizeHttpRequests { auth ->
                 auth.requestMatchers(
                     AntPathRequestMatcher("/ws/**"),
                     AntPathRequestMatcher("/login/**"),
-                    AntPathRequestMatcher("/signup/**")
+                    AntPathRequestMatcher("/signup/**"),
+                    AntPathRequestMatcher("/error"),
                 ).permitAll()
                     .anyRequest().authenticated()
             }.addFilterBefore(
                 JWTAuthenticationFilter(jwtDecoder, authenticationManager, tokenHelperService, objectMapper),
                 UsernamePasswordAuthenticationFilter::class.java
             ).addFilter(JWTAuthorizationFilter(jwtDecoder, authenticationManager))
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val corsConfiguration = CorsConfiguration()
+        corsConfiguration.allowedOrigins = listOf("*")
+        corsConfiguration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
+        corsConfiguration.allowCredentials = false
+        corsConfiguration.allowedHeaders = listOf("*")
+        corsConfiguration.maxAge = 3600L
+        val source: UrlBasedCorsConfigurationSource = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", corsConfiguration)
+        return source
     }
 
     @Bean

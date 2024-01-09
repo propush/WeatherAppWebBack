@@ -1,0 +1,57 @@
+version: '3.3'
+services:
+
+  swag:
+    image: lscr.io/linuxserver/swag:latest
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1001
+      - TZ=Etc/UTC
+      - URL=your.site
+      - VALIDATION=http
+      - SUBDOMAINS=api
+      - EMAIL=your@email
+      - ONLY_SUBDOMAINS=false
+      - STAGING=false
+    volumes:
+      - /home/your.user/config:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+
+  app:
+    build:
+      context: build
+      dockerfile: Dockerfile
+    container_name: wa_back
+    restart: unless-stopped
+    environment:
+#Mandatory:
+      - JWT_KEY
+      - OPENWEATHERMAP_API_KEY
+      - MONGO_URI
+      - ADMIN_USERNAME
+      - ADMIN_PASSWORD
+#Optional:
+      - LOG_LEVEL
+      - OPENWEATHERMAP_BASE_URL
+      - OPENWEATHERMAP_LIMIT
+      - WEATHER_CACHE_TTL_SECONDS
+      - GEODATA_CACHE_TTL_SECONDS
+
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    environment:
+#Mandatory:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

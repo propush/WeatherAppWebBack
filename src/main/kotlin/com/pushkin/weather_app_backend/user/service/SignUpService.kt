@@ -3,24 +3,43 @@ package com.pushkin.weather_app_backend.user.service
 import com.pushkin.weather_app_backend.security.service.TokenHelperService
 import com.pushkin.weather_app_backend.security.vo.JWTResponseVO
 import com.pushkin.weather_app_backend.user.exception.SignUpException
-import com.pushkin.weather_app_backend.user.vo.ConfirmCodeRq
+import com.pushkin.weather_app_backend.user.vo.SignInRq
 import com.pushkin.weather_app_backend.user.vo.SignUpRq
-import org.springframework.beans.factory.annotation.Autowired
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class SignUpService(
-    @Autowired val tokenHelperService: TokenHelperService
+    private val tokenHelperService: TokenHelperService,
+    private val userService: UserService
 ) {
 
     @Throws(SignUpException::class)
-    fun signUp(confirmCodeRq: ConfirmCodeRq): JWTResponseVO =
-        JWTResponseVO(tokenHelperService.createDefaultUserToken(confirmCodeRq.login))
+    fun register(signUpRq: SignUpRq): JWTResponseVO {
+        logger.info { "Registering user: ${signUpRq.login}" }
+        try {
+            val user = userService.register(signUpRq)
+            return JWTResponseVO(tokenHelperService.createDefaultUserToken(signUpRq.login))
+        } catch (e: Exception) {
+            logger.warn { "Error registering user: ${signUpRq.login}" }
+            throw SignUpException("Error registering: ${signUpRq.login}", e)
+        }
+    }
 
     @Throws(SignUpException::class)
-    fun register(signUpRq: SignUpRq) {
-        if (signUpRq.login == "bad") {
-            throw SignUpException("Wrong name: ${signUpRq.login}")
+    fun signIn(signInRq: SignInRq): JWTResponseVO {
+        logger.info { "Signing in user: ${signInRq.login}" }
+        try {
+            val user = userService.findByActiveLoginOrThrow(signInRq.login)
+            if (!userService.checkPassword(signInRq.password, user.encryptedPassword)) {
+                logger.warn { "Wrong password for user: ${signInRq.login}" }
+                throw SignUpException("Bad user or password for user: ${signInRq.login}")
+            }
+            return JWTResponseVO(tokenHelperService.createDefaultUserToken(signInRq.login))
+        } catch (e: Exception) {
+            throw SignUpException("Error signing in: ${signInRq.login}", e)
         }
     }
 

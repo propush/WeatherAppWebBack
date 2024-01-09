@@ -16,3 +16,22 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI:mongodb://test:test@localhost:27017/weather}
+  profiles:
+    active: "prod"
+
+openweathermap:
+  api-key: ${OPENWEATHERMAP_API_KEY:}
+  url: ${OPENWEATHERMAP_BASE_URL:https://api.openweathermap.org}
+  limit: ${OPENWEATHERMAP_LIMIT:10}
+
+weather:
+  cache:
+    ttl_seconds: ${WEATHER_CACHE_TTL_SECONDS:3600}
+
+geodata:
+  cache:
+    ttl_seconds: ${GEODATA_CACHE_TTL_SECONDS:43200}
+
+server:
+  error:
+    include-message: always

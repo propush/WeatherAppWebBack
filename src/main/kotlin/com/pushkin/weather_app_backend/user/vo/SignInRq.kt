@@ -1,6 +1,6 @@
 package com.pushkin.weather_app_backend.user.vo
 
-data class ConfirmCodeRq(
+data class SignInRq(
     val login: String,
-    val code: String
+    val password: String
 )

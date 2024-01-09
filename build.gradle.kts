@@ -38,14 +38,19 @@ dependencies {
     implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.6.8")
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
-
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.1")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+    testImplementation("org.testcontainers:mongodb:1.19.3")
 }
 
 tasks.withType<KotlinCompile> {
@@ -57,4 +62,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    testLogging { events("passed", "skipped", "failed", "standardOut", "standardError") }
+    systemProperties = System.getProperties().map { it.key.toString() to it.value.toString() }.toMap()
 }

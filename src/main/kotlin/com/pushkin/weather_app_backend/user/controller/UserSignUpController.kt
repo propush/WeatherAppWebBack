@@ -3,7 +3,7 @@ package com.pushkin.weather_app_backend.user.controller
 import com.pushkin.weather_app_backend.base.BaseController
 import com.pushkin.weather_app_backend.security.vo.JWTResponseVO
 import com.pushkin.weather_app_backend.user.service.SignUpService
-import com.pushkin.weather_app_backend.user.vo.ConfirmCodeRq
+import com.pushkin.weather_app_backend.user.vo.SignInRq
 import com.pushkin.weather_app_backend.user.vo.SignUpRq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController
 class UserSignUpController(@Autowired val signUpService: SignUpService) : BaseController() {
 
     @PostMapping("/register")
-    fun signUp(@RequestBody signUpRq: SignUpRq): ResponseEntity<Any> =
+    fun signUp(@RequestBody signUpRq: SignUpRq): ResponseEntity<JWTResponseVO> =
         processServiceExceptions { signUpService.register(signUpRq) }
 
-    @PostMapping("/confirm")
-    fun confirm(@RequestBody confirmCodeRq: ConfirmCodeRq): ResponseEntity<JWTResponseVO> =
-        processServiceExceptions { signUpService.signUp(confirmCodeRq) }
+    @PostMapping("/signin")
+    fun signIn(@RequestBody signInRq: SignInRq): ResponseEntity<JWTResponseVO> =
+        processServiceExceptions { signUpService.signIn(signInRq) }
 
 }
