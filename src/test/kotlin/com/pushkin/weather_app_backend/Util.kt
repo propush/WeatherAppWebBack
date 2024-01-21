@@ -1,6 +1,7 @@
 package com.pushkin.weather_app_backend
 
 import com.pushkin.weather_app_backend.weather.vo.*
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 fun mockWeatherResponse(name: String) = WeatherResponse(
     coord = Coord(1.0, 2.0),
@@ -17,3 +18,8 @@ fun mockWeatherResponse(name: String) = WeatherResponse(
     name = name,
     cod = 200
 )
+
+val objectMapper = ObjectMapper()
+
+fun toJson(obj: Any): String =
+    objectMapper.writeValueAsString(obj)
