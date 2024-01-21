@@ -26,8 +26,8 @@ jobs:
       - name: Deploy to PROD Server
         if: github.ref == 'refs/heads/master'
         run: |
-          ls -la
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "sudo rm -rf ${{ vars.SSH_PATH_MASTER }}/*"
+          ls -la && find build -ls
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "sudo rm -rf ${{ vars.SSH_PATH_MASTER }}/* && mkdir -p ${{ vars.SSH_PATH_MASTER }}/libs"
           scp -r -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no build/libs/weather_app_backend-*-SNAPSHOT.jar ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.SSH_PATH_MASTER }}/libs
           scp -r -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no docker/Dockerfile ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.SSH_PATH_MASTER }}
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }} "cd weather && ./start.sh"
