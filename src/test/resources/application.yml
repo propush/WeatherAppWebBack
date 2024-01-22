@@ -37,3 +37,4 @@ geodata:
 server:
   error:
     include-message: always
+  forward-headers-strategy: framework
