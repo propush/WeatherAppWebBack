@@ -10,6 +10,10 @@ users:
   swagger-admin:
     login: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin}
+
+cors:
+  allowed-origins: "*"
+
 spring:
   data:
     mongodb:

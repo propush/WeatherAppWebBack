@@ -5,6 +5,7 @@ import com.pushkin.weather_app_backend.security.service.JWTAuthenticationFilter
 import com.pushkin.weather_app_backend.security.service.JWTAuthorizationFilter
 import com.pushkin.weather_app_backend.security.service.JWTDecoder
 import com.pushkin.weather_app_backend.security.service.TokenHelperService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Lazy
@@ -32,6 +33,9 @@ class WebSecurityConfiguration(
     private val objectMapper: ObjectMapper,
     @Lazy private val authenticationManager: AuthenticationManager
 ) {
+
+    @Value("\${cors.allowed-origins}")
+    private lateinit var allowedOrigins: List<String>
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -76,7 +80,7 @@ class WebSecurityConfiguration(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration()
-        corsConfiguration.allowedOrigins = listOf("*")
+        corsConfiguration.allowedOrigins = allowedOrigins
         corsConfiguration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
         corsConfiguration.allowCredentials = false
         corsConfiguration.allowedHeaders = listOf("*")
