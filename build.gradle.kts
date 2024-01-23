@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-jwt:1.1.1.RELEASE")
     implementation("org.springframework.security.oauth:spring-security-oauth2:2.5.2.RELEASE")
     implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.6.8")
+    implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
     implementation("io.github.oshai:kotlin-logging-jvm:6.0.1")

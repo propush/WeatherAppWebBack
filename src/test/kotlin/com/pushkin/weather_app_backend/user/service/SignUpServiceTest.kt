@@ -1,10 +1,12 @@
 package com.pushkin.weather_app_backend.user.service
 
 import com.pushkin.weather_app_backend.security.service.TokenHelperService
+import com.pushkin.weather_app_backend.user.entity.TokenType
 import com.pushkin.weather_app_backend.user.entity.User
 import com.pushkin.weather_app_backend.user.exception.SignUpException
 import com.pushkin.weather_app_backend.user.exception.UserException
 import com.pushkin.weather_app_backend.user.exception.UserExistsException
+import com.pushkin.weather_app_backend.user.vo.ExchangeTokenRq
 import com.pushkin.weather_app_backend.user.vo.SignInRq
 import com.pushkin.weather_app_backend.user.vo.SignUpRq
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,6 +25,8 @@ class SignUpServiceTest {
     fun setUp() {
         tokenHelperService = mock {
             on { createDefaultUserToken(eq("l1")) } doReturn "t1"
+            on { createDefaultUserToken(eq("l2")) } doReturn "t2"
+            on { getLoginFromToken(eq("t2"), eq(TokenType.google)) } doReturn "l2"
         }
         userService = mock {
             on { register(eq(SignUpRq("existing", "p1"))) } doThrow UserExistsException("User already exists")
@@ -43,6 +47,11 @@ class SignUpServiceTest {
 
             on { checkPassword(eq("p1"), eq("p1")) } doReturn true
             on { checkPassword(eq("wrong"), eq("p1")) } doReturn false
+
+            on { getOrCreateByToken(eq("l2"), eq(TokenType.google)) } doReturn User(
+                login = "l2",
+                encryptedPassword = null
+            )
         }
         signUpService = SignUpService(
             tokenHelperService,
@@ -134,6 +143,19 @@ class SignUpServiceTest {
         verifyNoInteractions(tokenHelperService)
         verify(userService).findByActiveLoginOrThrow(eq("inactive"))
         verify(userService, never()).checkPassword(any(), any())
+    }
+
+    @Test
+    fun exchangeToken() {
+        val jwtResponseVO = signUpService.exchangeToken(
+            ExchangeTokenRq(
+                "t2",
+                TokenType.google
+            )
+        )
+        assertEquals("t2", jwtResponseVO.token)
+        verify(tokenHelperService).createDefaultUserToken(eq("l2"))
+        verify(userService).getOrCreateByToken(eq("l2"), eq(TokenType.google))
     }
 
 }

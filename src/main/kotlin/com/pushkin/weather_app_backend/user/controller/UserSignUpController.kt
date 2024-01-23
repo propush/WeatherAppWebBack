@@ -3,6 +3,7 @@ package com.pushkin.weather_app_backend.user.controller
 import com.pushkin.weather_app_backend.base.BaseController
 import com.pushkin.weather_app_backend.security.vo.JWTResponseVO
 import com.pushkin.weather_app_backend.user.service.SignUpService
+import com.pushkin.weather_app_backend.user.vo.ExchangeTokenRq
 import com.pushkin.weather_app_backend.user.vo.SignInRq
 import com.pushkin.weather_app_backend.user.vo.SignUpRq
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,5 +24,9 @@ class UserSignUpController(@Autowired val signUpService: SignUpService) : BaseCo
     @PostMapping("/signin")
     fun signIn(@RequestBody signInRq: SignInRq): ResponseEntity<JWTResponseVO> =
         processServiceExceptions { signUpService.signIn(signInRq) }
+
+    @PostMapping("/exchange-token")
+    fun exchangeToken(@RequestBody externalTokenRq: ExchangeTokenRq): ResponseEntity<JWTResponseVO> =
+        processServiceExceptions { signUpService.exchangeToken(externalTokenRq) }
 
 }

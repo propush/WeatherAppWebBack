@@ -39,7 +39,8 @@ class PwdUserAuthenticationProvider(
 
     private fun isUserValid(login: String, password: String): Boolean {
         val user = userService.findByLogin(login) ?: return false
-        return userService.checkPassword(password, user.encryptedPassword)
+        val encryptedPassword = user.encryptedPassword ?: return false
+        return userService.checkPassword(password, encryptedPassword)
     }
 
     private fun isSwaggerAdmin(userAuthToken: Authentication): Boolean =

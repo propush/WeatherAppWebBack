@@ -2,8 +2,10 @@ package com.pushkin.weather_app_backend.user.controller
 
 import com.pushkin.weather_app_backend.security.vo.JWTResponseVO
 import com.pushkin.weather_app_backend.toJson
+import com.pushkin.weather_app_backend.user.entity.TokenType
 import com.pushkin.weather_app_backend.user.exception.SignUpException
 import com.pushkin.weather_app_backend.user.service.SignUpService
+import com.pushkin.weather_app_backend.user.vo.ExchangeTokenRq
 import com.pushkin.weather_app_backend.user.vo.SignInRq
 import com.pushkin.weather_app_backend.user.vo.SignUpRq
 import org.junit.jupiter.api.BeforeEach
@@ -40,6 +42,8 @@ class UserSignUpControllerTest {
         whenever(signUpService.signIn(argThat { login == "bad" }))
             .thenThrow(SignUpException("Bad user"))
         whenever(signUpService.register(argThat { login == "l1" && password == "p1" }))
+            .thenReturn(JWTResponseVO("t1"))
+        whenever(signUpService.exchangeToken(argThat { externalToken == "et1" && externalTokenType == TokenType.google }))
             .thenReturn(JWTResponseVO("t1"))
     }
 
@@ -84,6 +88,22 @@ class UserSignUpControllerTest {
             .andDo { println("Handler: ${it.handler}") }
             .andExpect(status().isForbidden)
         verify(signUpService).signIn(argThat { login == "bad" && password == "p1" })
+    }
+
+    @Test
+    fun exchangeToken() {
+        mockMvc.perform(
+            post("/signup/exchange-token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(ExchangeTokenRq("et1", TokenType.google)))
+                .with(csrf())
+        )
+            .andDo { println("Handler: ${it.handler}") }
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.token").value("t1"))
+        verify(signUpService)
+            .exchangeToken(argThat { externalToken == "et1" && externalTokenType == TokenType.google })
     }
 
 }

@@ -7,10 +7,12 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.stereotype.Component
 
 @Component
-class JWTDecoder {
+class JWTDecoder(private val nimbusJwtDecoder: NimbusJwtDecoder) {
 
     companion object {
         private const val TOKEN_PREFIX = "Bearer "
@@ -39,5 +41,8 @@ class JWTDecoder {
             ?.map { GrantedAuthority { it } }
             ?.toList()
             ?: emptyList()
+
+    fun decodeGoogle(token: String): Jwt? =
+        nimbusJwtDecoder.decode(token)
 
 }

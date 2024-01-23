@@ -12,10 +12,11 @@ class User(
     var id: String? = null,
     @Indexed(unique = true)
     val login: String,
-    val encryptedPassword: String,
+    val encryptedPassword: String?,
     var active: Boolean = true,
     val locations: SortedSet<String> = sortedSetOf(),
-    val registeredDt: ZonedDateTime = ZonedDateTime.now()
+    val registeredDt: ZonedDateTime = ZonedDateTime.now(),
+    val tokenType: TokenType? = null,
 ) {
 
     override fun equals(other: Any?): Boolean {
